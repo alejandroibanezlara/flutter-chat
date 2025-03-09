@@ -23,7 +23,7 @@ class LoginPage extends StatelessWidget {
               children: <Widget>[
                 Logo(titulo: 'Inicio'),
                 _Form(),
-                Labels(ruta: 'register',texto1: '¿No tienes cuenta?',  texto2: 'Crea una ahora!'),
+                Labels(ruta: 'register', texto1: '¿No tienes cuenta?',  texto2: 'Crea una ahora!'),
                 Terms(),
               ],
             ),
