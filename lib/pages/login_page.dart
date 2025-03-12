@@ -1,9 +1,13 @@
+import 'package:chat/global/environment.dart';
+import 'package:chat/helpers/mostrar_alerta.dart';
 import 'package:chat/widgets/btn_azul.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/labels.dart';
 import 'package:chat/widgets/logo.dart';
 import 'package:chat/widgets/terms.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:chat/services/auth_service.dart';
 
 
 class LoginPage extends StatelessWidget {
@@ -53,6 +57,9 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+
+    final authService = Provider.of<AuthService>( context );
+
     return Container(
 
       margin: EdgeInsets.only(top: 40),
@@ -75,8 +82,20 @@ class _FormState extends State<_Form> {
           BtnAzul(
             texto: 'Ingresar',
             color: Colors.blue,
-            onPress: (){
-              print(emailCtrl);
+            
+            onPress: authService.autenticando ? (){} : () async {
+              
+
+              FocusScope.of(context).unfocus();
+              final loginOK = await authService.login(emailCtrl.text, passCtrl.text);
+
+              if(loginOK){
+                Navigator.pushReplacementNamed(context, 'usuarios');
+              }else{
+                mostrarAlerta(context, 'Login KO', 'Revisar credenciales');
+              }
+
+
             } ,
           )
         ],
