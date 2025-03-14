@@ -1,5 +1,6 @@
 import 'package:chat/global/environment.dart';
 import 'package:chat/helpers/mostrar_alerta.dart';
+import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/btn_azul.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/labels.dart';
@@ -59,6 +60,7 @@ class _FormState extends State<_Form> {
   Widget build(BuildContext context) {
 
     final authService = Provider.of<AuthService>( context );
+    final socketService = Provider.of<SocketService>( context );
 
     return Container(
 
@@ -90,6 +92,7 @@ class _FormState extends State<_Form> {
               final loginOK = await authService.login(emailCtrl.text, passCtrl.text);
 
               if(loginOK){
+                socketService.connect();
                 Navigator.pushReplacementNamed(context, 'usuarios');
               }else{
                 mostrarAlerta(context, 'Login KO', 'Revisar credenciales');
