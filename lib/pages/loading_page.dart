@@ -1,3 +1,4 @@
+import 'package:chat/pages/main_menu/home_page.dart';
 import 'package:chat/pages/login_page.dart';
 import 'package:chat/pages/usuarios_page.dart';
 import 'package:chat/services/auth_service.dart';
@@ -22,6 +23,9 @@ class LoadingPage extends StatelessWidget {
     );
   }
 
+
+  
+
   Future checkLoginState(BuildContext context) async{
     final authService = Provider.of<AuthService>(context, listen: false);
     final socketService = Provider.of<SocketService>(context, listen: false);
@@ -33,14 +37,19 @@ class LoadingPage extends StatelessWidget {
       socketService.connect();
       Navigator.pushReplacement(context, 
         PageRouteBuilder(
-          pageBuilder: ( _, __, ___ ) => UsuariosPage()
+          // pageBuilder: ( _, __, ___ ) => UsuariosPage(),
+          pageBuilder: ( _, __, ___ ) => HomePage(),
+          transitionDuration: Duration(milliseconds: 0)
           ));
     }else{
       // Navigator.pushReplacementNamed(context, 'login');
       Navigator.pushReplacement(context, 
         PageRouteBuilder(
-          pageBuilder: ( _, __, ___ ) => LoginPage()
+          pageBuilder: ( _, __, ___ ) => LoginPage(),
+          transitionDuration: Duration(milliseconds: 0)
           ));
     }
   }
 }
+
+

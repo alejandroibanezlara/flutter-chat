@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "495155214494",
+    "project_id": "ser-invenci",
+    "storage_bucket": "ser-invenci.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:495155214494:android:959cc95f8217a394f8a38f",
+        "android_client_info": {
+          "package_name": "com.serinvencible.serinvencibleapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "495155214494-1rbpkqkismditme2iqb19b1aiverma23.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.serinvencible.serinvencibleapp",
+            "certificate_hash": "a56b98ced53716d0775316d94661304a422cb4a5"
+          }
+        },
+        {
+          "client_id": "495155214494-gjblj1or2u9u0hlumsfs8i8lbpoc73ua.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7pmHpMxe_NwOF9KxT_fQj83jbmg7Um4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "495155214494-gjblj1or2u9u0hlumsfs8i8lbpoc73ua.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

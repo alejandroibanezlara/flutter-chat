@@ -1,8 +1,11 @@
 import 'package:chat/models/usuario.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/chat_service.dart';
+import 'package:chat/services/google2_signin_service.dart';
+import 'package:chat/services/google_signin_service.dart';
 import 'package:chat/services/socket_service.dart';
 import 'package:chat/services/usuarios_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -18,6 +21,8 @@ class UsuariosPage extends StatefulWidget {
 class _UsuariosPageState extends State<UsuariosPage> {
 
   final usuarioService = new UsuariosService();
+  
+  GoogleSignInService2 googleService = GoogleSignInService2();
   
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
@@ -36,16 +41,21 @@ class _UsuariosPageState extends State<UsuariosPage> {
     final authService = Provider.of<AuthService>(context);
     final socketService = Provider.of<SocketService>(context);
 
+    FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
     final usuario = authService.usuario;
 
     return Scaffold(
       appBar: AppBar(
-        title:Text(usuario!.nombre),
+        title:Text('${firebaseAuth.currentUser?.displayName ?? 'Home'}'),
+        // title:Text(usuario!.nombre),
         elevation: 1,
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: (){
             socketService.disconnect();
+            googleService.signOut();
+            // GoogleSignInService.signOut();
             Navigator.pushReplacementNamed(context, 'login');
             AuthService.deleteToken();
           }, 

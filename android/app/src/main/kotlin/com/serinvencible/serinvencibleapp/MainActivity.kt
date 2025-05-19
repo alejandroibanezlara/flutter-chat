@@ -1,4 +1,4 @@
-package com.example.chat
+package com.serinvencible.serinvencibleapp
 
 import io.flutter.embedding.android.FlutterActivity
 

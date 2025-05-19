@@ -10,6 +10,10 @@ import 'package:chat/global/environment.dart';
 import 'package:chat/models/login_response.dart';
 import 'package:chat/models/usuario.dart';
 
+
+import 'package:google_sign_in/google_sign_in.dart';
+
+
 class AuthService with ChangeNotifier {
 
   Usuario? usuario;
@@ -76,6 +80,7 @@ class AuthService with ChangeNotifier {
 
   }
 
+
   Future register(String nombre, String email, String password) async {
    
    autenticando = true;
@@ -122,6 +127,7 @@ class AuthService with ChangeNotifier {
         'x-token': token!
       }
     );
+
 
     if(resp.statusCode == 200){
       final loginRessponse = loginResponseFromJson(resp.body);

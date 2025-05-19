@@ -1,11 +1,14 @@
 import 'package:chat/global/environment.dart';
 import 'package:chat/helpers/mostrar_alerta.dart';
+import 'package:chat/services/google2_signin_service.dart';
+import 'package:chat/services/google_signin_service.dart';
 import 'package:chat/services/socket_service.dart';
 import 'package:chat/widgets/btn_azul.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/labels.dart';
 import 'package:chat/widgets/logo.dart';
 import 'package:chat/widgets/terms.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chat/services/auth_service.dart';
@@ -61,6 +64,7 @@ class _FormState extends State<_Form> {
 
     final authService = Provider.of<AuthService>( context );
     final socketService = Provider.of<SocketService>( context );
+    GoogleSignInService2 googleService = GoogleSignInService2();
 
     return Container(
 
@@ -93,14 +97,32 @@ class _FormState extends State<_Form> {
 
               if(loginOK){
                 socketService.connect();
-                Navigator.pushReplacementNamed(context, 'usuarios');
+                Navigator.pushReplacementNamed(context, 'home');
               }else{
                 mostrarAlerta(context, 'Login KO', 'Revisar credenciales');
               }
 
 
             } ,
-          )
+          ),
+
+          BtnAzul(
+            texto: 'GOOGLE',
+            color: Colors.blue,
+            
+            onPress: () async{
+              final loginOK2 = await googleService.signInWithGoogle2();
+
+
+              if(loginOK2 == true){
+                socketService.connect();
+                Navigator.pushReplacementNamed(context, 'usuarios');
+              }else{
+                mostrarAlerta(context, 'Login KO', 'Revisar credenciales');
+              }
+
+            } ,
+          ),
         ],
       ),
     );

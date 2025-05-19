@@ -12,19 +12,25 @@ class Usuario {
     bool online;
     String nombre;
     String email;
+    // String? picture;
+    // String? name;
     String uid;
 
     Usuario({
         required this.online,
         required this.nombre,
         required this.email,
-        required this.uid,
+        required this.uid, 
+        // required picture, 
+        // required name,
     });
 
     factory Usuario.fromJson(Map<String, dynamic> json) => Usuario(
         online: json["online"],
         nombre: json["nombre"],
         email: json["email"],
+        // picture: json["picture"],
+        // name: json["name"],
         uid: json["uid"],
     );
 
@@ -32,6 +38,8 @@ class Usuario {
         "online": online,
         "nombre": nombre,
         "email": email,
+        // "picture": picture,
+        // "name": name,
         "uid": uid,
     };
 }
