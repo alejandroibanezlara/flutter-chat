@@ -1,208 +1,141 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:chat/services/objectives/objectives_service.dart';
+import 'package:chat/models/objective.dart';
 
-/// Modelo de datos para un hito
-class Milestone {
-  final String description;
-  final DateTime date;
-  bool completed;
-
-  Milestone({
-    required this.description,
-    required this.date,
-    this.completed = false,
-  });
-}
-
-/// Widget que representa la estructura de un objetivo.
-class ObjectiveCardWidget extends StatefulWidget {
-  final String objectiveName;
-  final DateTime startDate;
-  final DateTime endDate;
-  final String reason; // Por qué quieres conseguir el objetivo
-  final List<Milestone> milestones;
+/// Widget que muestra de forma elegante los datos de un objetivo recuperado desde la base de datos.
+class ObjectiveCardWidget extends StatelessWidget {
+  /// Identificador del usuario para recuperar datos.
+  final String userId;
 
   const ObjectiveCardWidget({
     Key? key,
-    required this.objectiveName,
-    required this.startDate,
-    required this.endDate,
-    required this.reason,
-    required this.milestones,
+    required this.userId,
   }) : super(key: key);
 
   @override
-  State<ObjectiveCardWidget> createState() => _ObjectiveCardWidgetState();
-}
-
-class _ObjectiveCardWidgetState extends State<ObjectiveCardWidget> {
-  final DateFormat _formatter = DateFormat('yyyy-MM-dd');
-  bool _expanded = false; // Controla si el contenedor está expandido o no
-
-  /// Abre un diálogo para añadir un nuevo hito.
-  Future<void> _showAddMilestoneDialog() async {
-    TextEditingController descriptionController = TextEditingController();
-    DateTime? selectedDate;
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Añadir nuevo hito'),
-          content: StatefulBuilder(
-            builder: (context, setStateDialog) {
-              return SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: descriptionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Descripción del hito',
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            selectedDate == null
-                                ? 'Fecha: No definida'
-                                : 'Fecha: ${_formatter.format(selectedDate!)}',
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            final DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(2020),
-                              lastDate: DateTime(2030),
-                            );
-                            if (picked != null) {
-                              setStateDialog(() {
-                                selectedDate = picked;
-                              });
-                            }
-                          },
-                          child: const Text('Elegir'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (descriptionController.text.isNotEmpty && selectedDate != null) {
-                  setState(() {
-                    widget.milestones.add(
-                      Milestone(
-                        description: descriptionController.text,
-                        date: selectedDate!,
-                      ),
-                    );
-                  });
-                  Navigator.of(context).pop();
-                }
-              },
-              child: const Text('Guardar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ExpansionTile(
-        initiallyExpanded: _expanded,
-        onExpansionChanged: (bool expanded) {
-          setState(() {
-            _expanded = expanded;
-          });
-        },
-        // Encabezado del contenedor
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Nombre del objetivo
-            Text(
-              widget.objectiveName,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+    final service = Provider.of<ObjectivesService>(context, listen: false);
+    final dateFormat = DateFormat('dd MMM yyyy');
+
+    return FutureBuilder<ObjetivoPersonal>(
+      future: service.getObjectiveByUserId(userId),
+      builder: (context, snapshot) {
+        // Spinner dentro de un Card con altura fija para evitar tamaño infinito
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 2,
+            child: SizedBox(
+              height: 150,
+              child: const Center(
+                child: CircularProgressIndicator(),
               ),
             ),
-            // Fechas de inicio y fin con íconos
-            Row(
+          );
+        }
+        // Error dentro de un Card con padding
+        if (snapshot.hasError || !snapshot.hasData) {
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  const Icon(Icons.error, color: Colors.red),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'No se pudo cargar el objetivo.',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final obj = snapshot.data!;
+
+        // Tarjeta de datos
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 4,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.play_arrow, size: 16),
-                const SizedBox(width: 4),
-                Text(_formatter.format(widget.startDate)),
-                const SizedBox(width: 16),
-                const Icon(Icons.flag, size: 16),
-                const SizedBox(width: 4),
-                Text(_formatter.format(widget.endDate)),
+                // Título
+                Text(
+                  obj.titulo,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Fechas
+                Row(
+                  children: [
+                    const Icon(Icons.play_arrow, size: 18),
+                    const SizedBox(width: 4),
+                    Text(dateFormat.format(obj.fechaCreacion)),
+                    const Spacer(),
+                    const Icon(Icons.flag, size: 18),
+                    const SizedBox(width: 4),
+                    Text(dateFormat.format(obj.fechaObjetivo)),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Beneficio (en lugar de reason)
+                Text(
+                  'Beneficio:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  obj.beneficios ?? 'No especificado',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 12),
+                // Áreas asociadas
+                if (obj.areaSerInvencible.isNotEmpty) ...[
+                  Text(
+                    'Áreas:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[700],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: obj.areaSerInvencible.map((area) {
+                      return Chip(
+                        label: Text(area.titulo),
+                        backgroundColor: Colors.blue.shade50,
+                      );
+                    }).toList(),
+                  ),
+                ],
               ],
             ),
-          ],
-        ),
-        // Subtítulo (motivo) justo debajo de las fechas
-        subtitle: Text(
-          widget.reason,
-          style: const TextStyle(color: Colors.grey),
-        ),
-        // Contenido que se muestra al expandir
-        children: [
-          if (widget.milestones.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('No hay hitos.'),
-            )
-          else
-            // Lista de hitos
-            ...widget.milestones.map((milestone) {
-              return ListTile(
-                // Icono que se alterna entre un círculo sin check y un check al pulsarlo
-                leading: IconButton(
-                  icon: Icon(
-                    milestone.completed
-                        ? Icons.check_circle
-                        : Icons.radio_button_unchecked,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      milestone.completed = !milestone.completed;
-                    });
-                  },
-                ),
-                title: Text(milestone.description),
-                subtitle: Text('Fecha: ${_formatter.format(milestone.date)}'),
-              );
-            }).toList(),
-
-          
-          // Botón para añadir más hitos
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: TextButton.icon(
-              onPressed: _showAddMilestoneDialog,
-              icon: const Icon(Icons.add),
-              label: const Text('Añadir hito'),
-            ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

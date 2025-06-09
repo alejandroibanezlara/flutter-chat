@@ -1,6 +1,6 @@
 import 'package:chat/pages/main_menu/home_page.dart';
 import 'package:chat/pages/login_page.dart';
-import 'package:chat/pages/usuarios_page.dart';
+import 'package:chat/pages/main_menu/_old/usuarios_page.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/socket_service.dart';
 import 'package:flutter/material.dart';

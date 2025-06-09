@@ -306,7 +306,10 @@ return Container(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
             // Acción para ir atrás
-            Navigator.pop(context);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              'home',                           // Nombre de tu ruta Home
+              (Route<dynamic> route) => false,  // Elimina todo lo anterior
+            );
           },
         ),
         // 5 barras centrales para indicar el paso actual

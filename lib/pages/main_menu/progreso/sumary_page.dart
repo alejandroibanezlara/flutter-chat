@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class RadarChartExample extends StatefulWidget {
-  const RadarChartExample({Key? key}) : super(key: key);
+import 'package:chat/pages/shared/colores.dart';
+import 'package:chat/services/auth_service.dart';
+import 'package:chat/services/personalData/metaData_User_service.dart';
+import 'package:chat/models/metaData_User.dart';
+import 'dart:math' as math;
 
-  @override
-  _RadarChartExampleState createState() => _RadarChartExampleState();
-}
+class VerticalBarChartExample extends StatelessWidget {
+  const VerticalBarChartExample({Key? key}) : super(key: key);
 
-class _RadarChartExampleState extends State<RadarChartExample> {
-  // Lista de áreas
-  final List<String> areas = [
+  static const List<String> areas = [
     'Empatía y Solidaridad',
     'Carisma',
     'Disciplina',
@@ -23,145 +24,248 @@ class _RadarChartExampleState extends State<RadarChartExample> {
     'Comunicación asertiva',
   ];
 
-  // Lista de íconos para cada área.
-  final List<IconData> areaIcons = [
-    Icons.group, // Empatía y Solidaridad
-    Icons.face, // Carisma
-    Icons.check, // Disciplina
-    Icons.assignment, // Organización
-    Icons.autorenew, // Adaptabilidad
-    Icons.image, // Imagen pulida
-    Icons.visibility, // Visión estratégica
-    Icons.money, // Educación financiera
-    Icons.trending_up, // Actitud de superación
-    Icons.chat, // Comunicación asertiva
+  static const List<IconData> areaIcons = [
+    Icons.group,
+    Icons.face,
+    Icons.check,
+    Icons.assignment,
+    Icons.autorenew,
+    Icons.image,
+    Icons.visibility,
+    Icons.money,
+    Icons.trending_up,
+    Icons.chat,
   ];
 
-  // Valores iniciales (escala de 0 a 10)
-  final List<double> areaValues = List.filled(10, 5.0);
+  static const Color rojoBurdeos = Color(0xFF800020);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // RadarChart con altura fija para mostrarlo adecuadamente.
-          SizedBox(
-            height: 300,
-            child: Padding(
-              padding: const EdgeInsets.all(25),
-              child: RadarChart(
-                RadarChartData(
-                  dataSets: [
-                    // Dataset dummy: fuerza el máximo a 10 en cada eje.
-                    RadarDataSet(
-                      dataEntries:
-                          List.generate(areas.length, (index) => RadarEntry(value: 10)),
-                      borderColor: Colors.transparent,
-                      fillColor: Colors.transparent,
-                      borderWidth: 0,
-                      entryRadius: 0,
+    final authSvc = Provider.of<AuthService>(context, listen: false);
+    final metaSvc = Provider.of<MetaDataUserService>(context, listen: false);
+    final uid     = authSvc.usuario!.uid;
+
+    return FutureBuilder<MetaDataUser>(
+      future: metaSvc.getStatsLight(uid),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasError || !snapshot.hasData) {
+          return Center(child: Text('Error al cargar estadísticas'));
+        }
+
+        final meta = snapshot.data!;
+
+        // Construir los arrays dinámicamente
+        final List<int> retosCumplidos = [
+          meta.retosEmpatiaYSolidaridad,
+          meta.retosCarisma,
+          meta.retosDisciplina,
+          meta.retosOrganizacion,
+          meta.retosAdaptabilidad,
+          meta.retosImagenPulida,
+          meta.retosVisionEstrategica,
+          meta.retosEducacionFinanciera,
+          meta.retosActitudDeSuperacion,
+          meta.retosComunicacionAsertiva,
+        ];
+
+        final List<double> areaValues = [
+          meta.puntosEmpatiaYSolidaridad.toDouble(),
+          meta.puntosCarisma.toDouble(),
+          meta.puntosDisciplina.toDouble(),
+          meta.puntosOrganizacion.toDouble(),
+          meta.puntosAdaptabilidad.toDouble(),
+          meta.puntosImagenPulida.toDouble(),
+          meta.puntosVisionEstrategica.toDouble(),
+          meta.puntosEducacionFinanciera.toDouble(),
+          meta.puntosActitudDeSuperacion.toDouble(),
+          meta.puntosComunicacionAsertiva.toDouble(),
+        ];
+
+
+
+        // Determinar top3 para colorear
+        final sorted = areaValues
+            .asMap()
+            .entries
+            .toList()
+              ..sort((a, b) => b.value.compareTo(a.value));
+        final top3 = sorted.take(3).map((e) => e.key).toSet();
+
+        final double sliderMax = areaValues.isEmpty
+              ? 1.0
+              : areaValues.reduce(math.max);
+
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // --- GRÁFICO DE BARRAS ---
+              SizedBox(
+                height: 300,
+                child: BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: areaValues.reduce(math.max) + 2,
+                    titlesData: FlTitlesData(
+                      leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 40,
+                          interval: 1,
+                          getTitlesWidget: (v, meta) {
+                            final i = v.toInt();
+                            if (i < 0 || i >= areas.length) return const SizedBox();
+                            return SideTitleWidget(
+                              meta: meta,
+                              angle: 0,
+                              child: Icon(areaIcons[i], size: 20, color: Colors.white70),
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                    // Otro dataset dummy para forzar la escala.
-                    RadarDataSet(
-                      dataEntries:
-                          List.generate(areas.length, (index) => RadarEntry(value: 0)),
-                      borderColor: Colors.transparent,
-                      fillColor: Colors.transparent,
-                      borderWidth: 0,
-                      entryRadius: 0,
-                    ),
-                    // Dataset real con los valores actuales.
-                    RadarDataSet(
-                      dataEntries:
-                          areaValues.map((value) => RadarEntry(value: value)).toList(),
-                      borderColor: Color(0xFFDC143C),
-                      fillColor: Color(0xFFDC143C).withValues(alpha: 0.3),
-                      borderWidth: 1,
-                      entryRadius: 2,
-                    ),
-                  ],
-                  // Para los títulos se usan los íconos.
-                  getTitle: (index, angle) {
-                    final icon = areaIcons[index];
-                    return RadarChartTitle(
-                      text: String.fromCharCode(icon.codePoint),
-                      angle: 0,
-                    );
-                  },
-                  tickCount: 5,
-                  tickBorderData: const BorderSide(color: Colors.grey),
-                  ticksTextStyle: const TextStyle(color: Colors.transparent),
-                  radarTouchData: RadarTouchData(
-                    touchCallback: (FlTouchEvent event, response) {
-                      // Lógica de toque si es necesario.
-                    },
-                  ),
-                  radarBackgroundColor: Colors.transparent,
-                  titlePositionPercentageOffset: 0.2,
-                  titleTextStyle: const TextStyle(
-                    fontSize: 24,
-                    fontFamily: 'MaterialIcons',
-                    color: Colors.grey,
+                    gridData: FlGridData(show: false),
+                    borderData: FlBorderData(show: false),
+                    barGroups: List.generate(areas.length, (i) {
+                      final color = top3.contains(i) ? rojoBurdeos : Colors.white70;
+                      return BarChartGroupData(
+                        x: i,
+                        barRods: [
+                          BarChartRodData(
+                            toY: areaValues[i],
+                            width: 16,
+                            borderRadius: BorderRadius.circular(4),
+                            color: color,
+                          ),
+                        ],
+                      );
+                    }),
                   ),
                 ),
               ),
-            ),
-          ),
-          // Lista de sliders para cada área.
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16.0),
-            itemCount: areas.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
+
+              const SizedBox(height: 16),
+
+              // --- TABLA RESPONSIVE ---
+              LayoutBuilder(builder: (context, constraints) {
+                return Table(
+                  border: TableBorder.symmetric(
+                    inside: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  columnWidths: const {
+                    0: FlexColumnWidth(2),
+                    1: FlexColumnWidth(1),
+                    2: FlexColumnWidth(1),
+                  },
                   children: [
-                    // Ícono y nombre del área, con ancho fijo.
-                    SizedBox(
-                      width: 180,
-                      child: Row(
+                    // Cabecera
+                    TableRow(
+                      decoration: BoxDecoration(color: grisCarbon),
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Text('Área', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Text('Retos', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Text('Puntos', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                    // Filas
+                    for (int i = 0; i < areas.length; i++)
+                      TableRow(
                         children: [
-                          Icon(areaIcons[index], size: 20),
-                          const SizedBox(width: 4),
-                          Flexible(
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Row(
+                              children: [
+                                Icon(areaIcons[i], size: 16),
+                                const SizedBox(width: 4),
+                                Flexible(child: Text(areas[i], overflow: TextOverflow.ellipsis)),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
                             child: Text(
-                              areas[index],
-                              style: const TextStyle(fontSize: 14),
-                              overflow: TextOverflow.ellipsis,
+                              retosCumplidos[i].toString(),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(
+                              areaValues[i].toStringAsFixed(1),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    // Slider para ajustar el valor.
-                    Expanded(
-                      child: Slider(
-                        min: 0,
-                        max: 10,
-                        divisions: 10,
-                        value: areaValues[index],
-                        label: '${areaValues[index].round()}',
-                        onChanged: (double newValue) {
-                          setState(() {
-                            areaValues[index] = newValue;
-                          });
-                        },
-                      ),
-                    ),
                   ],
-                ),
-              );
-            },
-          )
-        ],
-      ),
+                );
+              }),
+
+              const SizedBox(height: 16),
+
+              // --- SLIDERS (read-only) ---
+              // ListView.builder(
+              //   shrinkWrap: true,
+              //   physics: const NeverScrollableScrollPhysics(),
+              //   itemCount: areas.length,
+              //   itemBuilder: (context, i) {
+              //     return Padding(
+              //       padding: const EdgeInsets.symmetric(vertical: 8.0),
+              //       child: Row(
+              //         children: [
+              //           SizedBox(
+              //             width: 180,
+              //             child: Row(
+              //               children: [
+              //                 Icon(areaIcons[i], size: 20, color: Colors.grey),
+              //                 const SizedBox(width: 4),
+              //                 Expanded(
+              //                   child: Text(
+              //                     areas[i],
+              //                     style: const TextStyle(fontSize: 14),
+              //                     overflow: TextOverflow.ellipsis,
+              //                   ),
+              //                 ),
+              //               ],
+              //             ),
+              //           ),
+              //           Expanded(
+              //             child: Slider(
+              //               min: 0,
+              //               max: sliderMax,
+              //               divisions: 10,
+              //               value: areaValues[i].clamp(0.0, sliderMax),
+              //               activeColor: rojoBurdeos,
+              //               inactiveColor: rojoBurdeos.withOpacity(0.3),
+              //               label: areaValues[i].toStringAsFixed(1),
+              //               onChanged: null, // read-only
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //     );
+              //   },
+              // ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
-
-

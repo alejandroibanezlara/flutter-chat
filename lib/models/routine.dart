@@ -180,6 +180,7 @@ class Routine {
   final String tiempoYlugar;
   final String tipoPersona;
   final String declaracionCompleta;
+  final String name;
   final List<Area> areas;
   final int? icono;
   final String tipo;
@@ -202,6 +203,7 @@ class Routine {
     required this.tiempoYlugar,
     required this.tipoPersona,
     required this.declaracionCompleta,
+    required this.name,
     required this.areas,
     this.icono,
     required this.tipo,
@@ -225,6 +227,7 @@ class Routine {
       'tiempoYlugar': tiempoYlugar,
       'tipoPersona': tipoPersona,
       'declaracionCompleta': declaracionCompleta,
+      'name': name,
       'areas': areas.map((e) => e.toJson()).toList(),
       'tipo': tipo,
       'status': status,
@@ -254,6 +257,7 @@ class Routine {
       tiempoYlugar: json['tiempoYlugar'] ?? '',
       tipoPersona: json['tipoPersona'] ?? '',
       declaracionCompleta: json['declaracionCompleta'] ?? '',
+      name: json['name'] ?? '',
       areas: (json['areas'] as List<dynamic>? ?? [])
           .map((e) => Area.fromJson(e))
           .toList(),

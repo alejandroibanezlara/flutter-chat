@@ -1,3 +1,4 @@
+import 'package:chat/models/challenge.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/pages/shared/colores.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -10,6 +11,7 @@ class RetoCard extends StatelessWidget {
   final String descripcion;      // Descripción del reto
   final List<IconData> iconos;   // Lista de iconos para representar aspectos del reto
   final bool compact;
+  final Challenge reto;
 
   const RetoCard({
     Key? key,
@@ -17,7 +19,8 @@ class RetoCard extends StatelessWidget {
     required this.titulo,
     required this.descripcion,
     required this.iconos,
-    this.compact = false,
+    this.compact = false, 
+    required this.reto,
   }) : super(key: key);
   
   @override
@@ -116,7 +119,8 @@ class RetoCard extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, 'reto_introduccion');
+                  // Navigator.pushNamed(context, 'reto_introduccion');
+                  Navigator.pushNamed(context, 'reto_introduccion', arguments: reto, );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: negroAbsoluto,
@@ -126,7 +130,7 @@ class RetoCard extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'Aceptar',
+                  'Leer más',
                   style: TextStyle(fontSize: 14, color: blancoSuave),
                 ),
               ),

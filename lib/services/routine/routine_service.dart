@@ -9,10 +9,7 @@ import 'package:chat/global/environment.dart';
 class RoutineService with ChangeNotifier {
   Future<Routine> createRoutine(Routine routine) async {
     final url = Uri.parse('${Environment.apiUrl}/routines');
-
-    print("routine");
-    print(routine);
-
+    
     // Convertir a mapa y eliminar claves con valor null
     final routineMap = routine.toJson()..removeWhere((key, value) => value == null);
 

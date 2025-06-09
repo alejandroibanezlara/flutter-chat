@@ -71,7 +71,11 @@ class _FourthQuestionPageState extends State<FourthQuestionPage> {
                   return ListTile(
                     title: Text(tasks[index], style: const TextStyle(color: Colors.white)),
                     trailing: selected
-                        ? FaIcon(FontAwesomeIcons.frog, color: Color(0xFFDC143C))
+                        ? Image.asset(
+                              'assets/icons/little_phoenix.png',
+                              width: 24,
+                              height: 24,
+                            )
                         : const SizedBox(width: 24),
                     onTap: () => setState(() => _selectedIndex = index),
                   );

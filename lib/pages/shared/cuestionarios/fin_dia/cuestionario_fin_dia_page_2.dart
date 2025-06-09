@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:chat/pages/shared/colores.dart';
+import 'package:chat/services/personalData/personalData_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SecondQuestionPage extends StatefulWidget {
   const SecondQuestionPage({Key? key}) : super(key: key);
@@ -34,7 +36,9 @@ class _SecondQuestionPageState extends State<SecondQuestionPage> {
 
   @override
   Widget build(BuildContext context) {
+    
     const currentStep = 1;
+    final personalDataSvc = Provider.of<PersonalDataService>(context, listen: false);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -71,7 +75,7 @@ class _SecondQuestionPageState extends State<SecondQuestionPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
-            '¿Cómo te estás sintiendo?',
+            '¿Cómo ha ido el día?',
             style: TextStyle(color: Colors.white70, fontSize: 24),
           ),
           const SizedBox(height: 24),
@@ -85,7 +89,7 @@ class _SecondQuestionPageState extends State<SecondQuestionPage> {
                 child: GestureDetector(
                   onTap: () {
                     setState(() => selectedIndex = i);
-
+                    personalDataSvc.setFinalAttitude(outlookOptions[i], outlookOptions);
                     // pausa corta para mostrar el resaltado
                     Timer(const Duration(milliseconds: 150), () {
                       Navigator.pushNamed(

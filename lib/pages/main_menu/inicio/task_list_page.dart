@@ -154,7 +154,11 @@ class _TaskListWidgetState extends State<TaskListWidget> {
                 icon: completed
                     ? const Icon(Icons.check_circle, color: Color(0xFFDC143C))
                     : (task.frog == true && task.status == 'pending'
-                        ? const FaIcon(FontAwesomeIcons.frog, color: Color(0xFFDC143C))
+                        ? Image.asset(
+                              'assets/icons/little_phoenix.png',
+                              width: 24,
+                              height: 24,
+                            )
                         : const Icon(Icons.radio_button_unchecked, color: Colors.grey)),
               ),
               const SizedBox(width: 16),

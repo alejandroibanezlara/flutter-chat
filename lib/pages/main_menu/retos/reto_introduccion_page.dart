@@ -1,19 +1,19 @@
+import 'package:chat/services/challenges/user_challenge_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';                       // ← Añadido
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:chat/pages/shared/colores.dart';
-
-// // Definición de la paleta de colores
-// const Color blancoSuave    = Color(0xFFF5F5F5);
-// const Color grisClaro      = Color(0xFFB0B0B0);
-// const Color grisCarbon     = Color(0xFF2C2C2E);
-// const Color negroAbsoluto  = Color(0xFF000000);
-// const Color rojoBurdeos    = Color(0xFFA4243B);
-// const Color dorado         = Color(0xFFEDA52F);
+import 'package:chat/models/challenge.dart';
 
 class RetoIntroduccionPage extends StatelessWidget {
-  const RetoIntroduccionPage({Key? key}) : super(key: key);
+  final Challenge reto;
+  
+  const RetoIntroduccionPage({
+    Key? key,
+    required this.reto,
+  }) : super(key: key);
 
-  // Método auxiliar para construir cada icono descriptivo
+  // Construye un icono descriptivo a partir de un label y un IconData
   Widget buildIcono(String label, IconData icono) {
     return Column(
       children: [
@@ -25,64 +25,67 @@ class RetoIntroduccionPage extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: Center(
-            child: Icon(
-              icono,
-              size: 24,
-              color: grisCarbon,
-            ),
+            child: Icon(icono, size: 24, color: grisCarbon),
           ),
         ),
         const SizedBox(height: 5),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: negroAbsoluto,
-          ),
-        )
+        Text(label, style: const TextStyle(fontSize: 12, color: negroAbsoluto)),
       ],
     );
   }
 
+  // Mapea el string del reto a un IconData (ajusta según tus iconos)
+  IconData _iconFromString(String? name) {
+    switch (name) {
+      case 'check_circle': return FontAwesomeIcons.checkCircle;
+      case 'star':         return FontAwesomeIcons.star;
+      case 'flag':         return FontAwesomeIcons.flag;
+      case 'running':      return FontAwesomeIcons.running;
+      default:             return FontAwesomeIcons.questionCircle;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final currentStep = 0;
+    const currentStep = 0;
+
+    // Lista de iconos de áreas invencibles (si existen)
+    final areaIconos = reto.areasSerInvencible
+            ?.map((a) => buildIcono(a.titulo, _iconFromString(a.icono)))
+            .toList() ??
+        [];
+
     return Scaffold(
       backgroundColor: negroAbsoluto,
-      // AppBar con flecha para regresar a la página anterior
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        // Flecha a la izquierda (atras minimalista)
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
           onPressed: () {
             // Acción para ir atrás
-            Navigator.pop(context);
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              'home',                           // Nombre de tu ruta Home
+              (Route<dynamic> route) => false,  // Elimina todo lo anterior
+            );
           },
         ),
-        // 5 barras centrales para indicar el paso actual
         centerTitle: true,
         title: Row(
           mainAxisSize: MainAxisSize.min,
-          children: List.generate(3, (index) {
+          children: List.generate(3, (idx) {
             return Container(
               margin: const EdgeInsets.symmetric(horizontal: 2),
               width: 40,
               height: 1,
-              // Cambia 'currentStep' por la variable que controla en qué paso estás (0..4)
-              color: (index <= currentStep) ? Colors.white : Colors.grey[800],
+              color: (idx <= currentStep) ? Colors.white : Colors.grey[800],
             );
           }),
         ),
-        // Botón "X" a la derecha para volver al inicio
         actions: [
           IconButton(
             icon: const Icon(Icons.close, color: Colors.white),
-            onPressed: () {
-              // Acción para volver al inicio
-              Navigator.popUntil(context, (route) => route.isFirst);
-            },
+            onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
           ),
         ],
       ),
@@ -90,7 +93,6 @@ class RetoIntroduccionPage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            // Tarjeta principal con estilo similar a RetoCard
             child: Container(
               padding: const EdgeInsets.all(12.0),
               decoration: BoxDecoration(
@@ -107,7 +109,7 @@ class RetoIntroduccionPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Fila 1: Icono representativo y título del reto
+                  // Fila 1: icono y título
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -118,20 +120,19 @@ class RetoIntroduccionPage extends StatelessWidget {
                           color: grisCarbon.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12.0),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: FaIcon(
-                            FontAwesomeIcons.running,
+                            _iconFromString(reto.icon),
                             size: 50,
                             color: grisCarbon,
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
-                      // Título del reto
                       Expanded(
                         child: Text(
-                          "Challenge of the Day",
-                          style: TextStyle(
+                          reto.title,
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: negroAbsoluto,
@@ -140,38 +141,121 @@ class RetoIntroduccionPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  // Imagen placeholder debajo de la fila superior
 
                   const SizedBox(height: 12),
-                  // Nueva fila para iconos descriptivos debajo de la imagen
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      buildIcono("Track", FontAwesomeIcons.chartLine),
-                      buildIcono("Focus", FontAwesomeIcons.search),
-                      buildIcono("Energy", FontAwesomeIcons.bolt),
-                      buildIcono("Wellbeing", FontAwesomeIcons.heart),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Fila 2: Descripción del reto
-                  Text(
-                    "Boost your energy and get moving with 20 Squats today. Embrace the challenge to build strength and discipline.",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: negroAbsoluto,
+
+                  // Iconos de áreas invencibles
+                  if (areaIconos.isNotEmpty) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: areaIconos,
                     ),
+                    const SizedBox(height: 12),
+                  ],
+
+                  // Descripción (larga o breve)
+                  Text(
+                    reto.description?.isNotEmpty == true
+                        ? reto.description!
+                        : reto.shortText,
+                    style: const TextStyle(fontSize: 16, color: negroAbsoluto),
                   ),
+
                   const SizedBox(height: 16),
-                  // Fila 3: Botones de acción: Aceptar y Rechazar
+
+                  // Botones de acción
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
-                        onPressed: () {
-                          // Acción para aceptar el reto
-                          Navigator.pushNamed(context, 'reto_texto');
+                        onPressed: () async {
+                          try {
+                            // 1) Registrar la dupla user/challenge
+                            await Provider.of<UserChallengeService>(
+                              context, listen: false
+                            ).createUserChallenge(reto);
+
+                            // 2) Navegar según el tipo de reto
+                            switch (reto.type) {
+                              case 'counter':
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_counter',
+                                  arguments: reto,
+                                );
+                                break;
+                              case 'inverse_counter':
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_inverse_counter',
+                                  arguments: reto,
+                                );
+                                break;  
+                              case 'checklist':
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_checklist',
+                                  arguments: reto,
+                                );
+                                break;
+                              case 'tempo':
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_tempo',
+                                  arguments: reto,
+                                );
+                                break;
+                              case 'crono':
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_crono',
+                                  arguments: reto,
+                                );
+                                break;
+                              case 'single':
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_unico',
+                                  arguments: reto,
+                                );
+                                break;
+                              case 'writing':
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_writing',
+                                  arguments: reto,
+                                );
+                                break;
+                              case 'math':
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_math',
+                                  arguments: reto,
+                                );
+                                break;
+                              case 'questionnaire':
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_questionnaire',
+                                  arguments: reto,
+                                );
+                                break;
+                              default:
+                                Navigator.pushNamed(
+                                  context,
+                                  'reto_writing',
+                                  arguments: reto,
+                                );
+                                break;
+                            }
+                          } catch (e) {
+                            // Si falla, mostramos un mensaje
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error al aceptar el reto: $e'),
+                              ),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: negroAbsoluto,
@@ -182,16 +266,11 @@ class RetoIntroduccionPage extends StatelessWidget {
                         ),
                         child: const Text(
                           'Aceptar el reto',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: blancoSuave,
-                          ),
+                          style: TextStyle(fontSize: 16, color: blancoSuave),
                         ),
                       ),
                       OutlinedButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, 'home');
-                        },
+                        onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: negroAbsoluto, width: 2),
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -201,10 +280,7 @@ class RetoIntroduccionPage extends StatelessWidget {
                         ),
                         child: const Text(
                           'Recházalo',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: negroAbsoluto,
-                          ),
+                          style: TextStyle(fontSize: 16, color: negroAbsoluto),
                         ),
                       ),
                     ],

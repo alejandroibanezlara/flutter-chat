@@ -1,4 +1,11 @@
 
+import 'package:chat/pages/shared/colores.dart';
+import 'package:chat/pages/shared/cuestionarios/inicial/cuestionario_inicial_page.dart';
+import 'package:chat/pages/shared/settings/terms/cookies.dart';
+import 'package:chat/pages/shared/settings/terms/privacity.dart';
+import 'package:chat/pages/shared/settings/terms/terms_and_condition.dart';
+import 'package:chat/pages/shared/settings/tutorial/tutorial.dart';
+import 'package:chat/services/personalData/personalData_service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +42,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
   final authService = Provider.of<AuthService>(context);
   final usuario = authService.usuario;
+
+  // Obtenemos el servicio una vez (reconstruye el widget cuando cambie)
+  final pds = Provider.of<PersonalDataService>(context);
+
   final notificationCount = 0;
     return AppBar(
       backgroundColor: Colors.black,
@@ -70,7 +81,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        usuario!.nombre,
+                                        usuario!.nombre ?? '',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18,
@@ -78,10 +89,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                         ),
                                       ),
                                       SizedBox(height: 4),
-                                      Text(
-                                        '4 active habits • 3 identities',
-                                        style: TextStyle(fontSize: 14, color: Colors.white),
-                                      ),
+
                                     ],
                                   ),
                                 ),
@@ -100,62 +108,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                 child: Column(
-                                  children: [
-                                    // Ejemplo de "Accountability partner"
-                                    Container(
-                                      margin: const EdgeInsets.only(bottom: 16.0),
-                                      padding: const EdgeInsets.all(16.0),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        color: Colors.black87,
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: const [
-                                              Icon(Icons.person,
-                                                  color: Colors.orange, size: 24),
-                                              SizedBox(width: 8),
-                                              Text(
-                                                'Accountability partner',
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 8),
-                                          const Text(
-                                            'You are more likely to stick to your habits if someone else knows about them.',
-                                            style: TextStyle(color: Colors.white70),
-                                          ),
-                                          const SizedBox(height: 16),
-                                          ElevatedButton(
-                                            onPressed: () {},
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.white,
-                                              // onPrimary: Colors.black87,
-                                              shape: const StadiumBorder(),
-                                            ),
-                                            child: const Text('Invite someone'),
-                                          ),
-                                          const SizedBox(height: 12),
-                                          OutlinedButton(
-                                            onPressed: () {},
-                                            style: OutlinedButton.styleFrom(
-                                              backgroundColor: Colors.white,
-                                              side: const BorderSide(color: Colors.white70),
-                                              shape: const StadiumBorder(),
-                                            ),
-                                            child: const Text('Have an invite from someone?'),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    
+                                  children: [                                    
                                     // Agrega más secciones o widgets según tu necesidad
                                     // Sección "Account information"
                                     Container(
@@ -165,12 +118,36 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           const Text(
-                                            'Account information',
+                                            'Configuración',
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
+                                          const SizedBox(height: 8),
+                                          // Botón "Email"
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => InitialQuestionnairePage(),
+                                                ),
+                                              );
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                              child: Row(
+                                                children: const [
+                                                  Expanded(child: Text('Información personal')),
+                                                  Icon(Icons.chevron_right),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          // Separador
+                                          Divider(color: Colors.grey[300], height: 0, thickness: 1),
+
                                           const SizedBox(height: 8),
                                           // Botón "Email"
                                           InkWell(
@@ -189,6 +166,41 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                           ),
                                           // Separador
                                           Divider(color: Colors.grey[300], height: 0, thickness: 1),
+                                          
+                                          // Botón "Cambiar nombre"
+                                          InkWell(
+                                            onTap: () {
+                                              // Navegar o mostrar algo al pulsar
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                              child: Row(
+                                                children: const [
+                                                  Expanded(child: Text('Nombre')),
+                                                  Icon(Icons.chevron_right),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          // Separador
+                                          Divider(color: Colors.grey[300], height: 0, thickness: 1),
+                                          // Botón "Cambiar idioma"
+                                          InkWell(
+                                            onTap: () {
+                                              // Navegar o mostrar algo al pulsar
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                              child: Row(
+                                                children: const [
+                                                  Expanded(child: Text('Idioma')),
+                                                  Icon(Icons.chevron_right),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          // Separador
+                                          Divider(color: Colors.grey[300], height: 0, thickness: 1),
                                           // Botón "Account plan" con "Trial"
                                           InkWell(
                                             onTap: () {
@@ -198,7 +210,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                               padding: const EdgeInsets.symmetric(vertical: 12.0),
                                               child: Row(
                                                 children: [
-                                                  const Expanded(child: Text('Account plan')),
+                                                  const Expanded(child: Text('Plan')),
                                                   // Etiqueta "Trial"
                                                   Container(
                                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -217,22 +229,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                               ),
                                             ),
                                           ),
-                                          Divider(color: Colors.grey[300], height: 0, thickness: 1),
-                                          // Botón "Connect on web"
-                                          InkWell(
-                                            onTap: () {
-                                              // Navegar o mostrar algo al pulsar
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                              child: Row(
-                                                children: const [
-                                                  Expanded(child: Text('Connect on web')),
-                                                  Icon(Icons.chevron_right),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -245,7 +241,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           const Text(
-                                            'Notifications',
+                                            'Notificaciones',
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
@@ -253,79 +249,93 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                           ),
                                           const SizedBox(height: 8),
                                           // Botón "Habit reminder"
-                                          InkWell(
-                                            onTap: () {
-                                              // Navegar o mostrar algo al pulsar
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                              child: Row(
-                                                children: const [
-                                                  Expanded(child: Text('Habit reminder')),
-                                                  Icon(Icons.chevron_right),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Divider(color: Colors.grey[300], height: 0, thickness: 1),
-                                          // Botón "Additional daily reminder"
-                                          InkWell(
-                                            onTap: () {
-                                              // Navegar o mostrar algo al pulsar
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: const [
-                                                      Expanded(child: Text('Additional daily reminder')),
-                                                      Icon(Icons.chevron_right),
-                                                    ],
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  const Text(
-                                                    'An all-in-one reminder to do your habits every day',
-                                                    style: TextStyle(fontSize: 12, color: Colors.grey),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
+                                          // InkWell(
+                                          //   onTap: () {
+                                          //     // Navegar o mostrar algo al pulsar
+                                          //   },
+                                          //   child: Padding(
+                                          //     padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                          //     child: Row(
+                                          //       children: const [
+                                          //         Expanded(child: Text('Habit reminder')),
+                                          //         Icon(Icons.chevron_right),
+                                          //       ],
+                                          //     ),
+                                          //   ),
+                                          // ),
+                                          // Divider(color: Colors.grey[300], height: 0, thickness: 1),
+                                          // // Botón "Additional daily reminder"
+                                          // InkWell(
+                                          //   onTap: () {
+                                          //     // Navegar o mostrar algo al pulsar
+                                          //   },
+                                          //   child: Padding(
+                                          //     padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                          //     child: Column(
+                                          //       crossAxisAlignment: CrossAxisAlignment.start,
+                                          //       children: [
+                                          //         Row(
+                                          //           children: const [
+                                          //             Expanded(child: Text('Additional daily reminder')),
+                                          //             Icon(Icons.chevron_right),
+                                          //           ],
+                                          //         ),
+                                          //         const SizedBox(height: 4),
+                                          //         const Text(
+                                          //           'An all-in-one reminder to do your habits every day',
+                                          //           style: TextStyle(fontSize: 12, color: Colors.grey),
+                                          //         ),
+                                          //       ],
+                                          //     ),
+                                          //   ),
+                                          // ),
                                           Divider(color: Colors.grey[300], height: 0, thickness: 1),
                                           // "App suggestions" con Switch
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                            child: Row(
-                                              children: [
-                                                const Expanded(child: Text('App suggestions')),
-                                                // Puedes guardar el estado del switch en una variable
-                                                Switch(
-                                                  value: true, 
-                                                  onChanged: (bool newValue) {
-                                                    // Lógica para habilitar/deshabilitar
-                                                  },
+                                          // ENVOLVEMOS en un Consumer para que solo esta parte "escuche"
+                                          Consumer<PersonalDataService>(
+                                            builder: (context, pds, _) {
+                                              return Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                                child: Row(
+                                                  children: [
+
+                                                    if(pds.notificacionesActivadas) const Expanded(child: Text('Activadas')),
+                                                    if(!pds.notificacionesActivadas) const Expanded(child: Text('Desactivadas')),
+                                                    Switch(
+                                                      value: pds.notificacionesActivadas,
+                                                      activeColor: rojoBurdeos,
+                                                      onChanged: (bool newValue) async {
+                                                        final uid = Provider.of<AuthService>(context, listen: false).usuario!.uid;
+                                                        // Llamamos a nuestro método optimista o directamente al backend
+                                                        await pds.updatePersonalDataByUserId(
+                                                          uid,
+                                                          {'notificacionesActivadas': newValue},
+                                                        );
+                                                      },
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
-                                            ),
+                                              );
+                                            },
                                           ),
 
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                            child: Row(
-                                              children: [
-                                                const Expanded(child: Text('Play sounds')),
-                                                // Puedes guardar el estado del switch en una variable
-                                                Switch(
-                                                  value: true, 
-                                                  onChanged: (bool newValue) {
-                                                    // Lógica para habilitar/deshabilitar
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                          
+
+                                          // Padding(
+                                          //   padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                          //   child: Row(
+                                          //     children: [
+                                          //       const Expanded(child: Text('Play sounds')),
+                                          //       // Puedes guardar el estado del switch en una variable
+                                          //       Switch(
+                                          //         value: true, 
+                                          //         onChanged: (bool newValue) {
+                                          //           // Lógica para habilitar/deshabilitar
+                                          //         },
+                                          //       ),
+                                          //     ],
+                                          //   ),
+                                          // ),
 
                                         ],
                                       ),
@@ -340,23 +350,29 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           const Text(
-                                            'Settings',
+                                            'Información',
                                             style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           const SizedBox(height: 8),
-                                          // "Language preferences"
+
+                                          // "Tutorial"
                                           InkWell(
                                             onTap: () {
-                                              // Acción o navegación
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => TutorialPage(),
+                                                ),
+                                              );
                                             },
                                             child: Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 12.0),
                                               child: Row(
                                                 children: const [
-                                                  Text('Language preferences'),
+                                                  Text('Tutorial'),
                                                   Spacer(),
                                                   Icon(Icons.chevron_right),
                                                 ],
@@ -365,52 +381,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                           ),
                                           Divider(color: Colors.grey[300], height: 0, thickness: 1),
 
-                                          // "Tutorials"
+                                          // "Cookies"
                                           InkWell(
                                             onTap: () {
-                                              // Acción o navegación
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => CookiePolicyPage(), // Ajusta el nombre si tu widget es otro
+                                                ),
+                                              );
                                             },
                                             child: Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 12.0),
                                               child: Row(
                                                 children: const [
-                                                  Text('👋 Tutorials'),
-                                                  Spacer(),
-                                                  Icon(Icons.chevron_right),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Divider(color: Colors.grey[300], height: 0, thickness: 1),
-
-                                          // "FAQ's"
-                                          InkWell(
-                                            onTap: () {
-                                              // Acción o navegación
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                              child: Row(
-                                                children: const [
-                                                  Text("FAQ's"),
-                                                  Spacer(),
-                                                  Icon(Icons.chevron_right),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          Divider(color: Colors.grey[300], height: 0, thickness: 1),
-
-                                          // "Help and support"
-                                          InkWell(
-                                            onTap: () {
-                                              // Acción o navegación
-                                            },
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                              child: Row(
-                                                children: const [
-                                                  Text('Help and support'),
+                                                  Text('Política de cookies'),
                                                   Spacer(),
                                                   Icon(Icons.chevron_right),
                                                 ],
@@ -422,13 +407,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                           // "Privacy Policy"
                                           InkWell(
                                             onTap: () {
-                                              // Acción o navegación
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => PrivacyPolicyPage(), // Ajusta el nombre si tu widget es otro
+                                                ),
+                                              );
                                             },
                                             child: Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 12.0),
                                               child: Row(
                                                 children: const [
-                                                  Text('Privacy Policy'),
+                                                  Text('Política de privacidad'),
                                                   Spacer(),
                                                   Icon(Icons.chevron_right),
                                                 ],
@@ -440,13 +430,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                           // "Terms and Conditions"
                                           InkWell(
                                             onTap: () {
-                                              // Acción o navegación
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => TermsAndConditionsPage(), // Ajusta el nombre si tu widget es otro
+                                                ),
+                                              );
                                             },
                                             child: Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                            
                                               child: Row(
                                                 children: const [
-                                                  Text('Terms and Conditions'),
+                                                  Text('Términos y condiciones'),
                                                   Spacer(),
                                                   Icon(Icons.chevron_right),
                                                 ],
@@ -457,8 +453,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
                                           // "Log out"
                                           InkWell(
-                                            onTap: () {
-                                              // Acción de cierre de sesión
+                                            onTap: () async {
+                                              final authService = Provider.of<AuthService>(context, listen: false);
+                                              // await authService.logout();
+                                              Navigator.pushReplacementNamed(context, 'login');
                                             },
                                             child: Padding(
                                               padding: const EdgeInsets.symmetric(vertical: 14.0),
@@ -466,7 +464,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                                 children: const [
                                                   Expanded(
                                                     child: Text(
-                                                      'Log out',
+                                                      'Cerrar sesión',
                                                       style: TextStyle(
                                                         color: Colors.redAccent,
                                                         fontWeight: FontWeight.bold,
@@ -491,7 +489,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                                 children: const [
                                                   Expanded(
                                                     child: Text(
-                                                      'Delete account and data',
+                                                      'Borrar cuenta',
                                                       style: TextStyle(
                                                         color: Colors.redAccent,
                                                         fontWeight: FontWeight.bold,

@@ -26,6 +26,26 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+//Añadido para ver el temporizador en la pantalla de bloqueo
+subprojects { proj ->
+    proj.plugins.withType(com.android.build.gradle.BasePlugin) {
+        proj.android {
+            defaultConfig {
+                multiDexEnabled true
+            }
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_1_8
+                targetCompatibility JavaVersion.VERSION_1_8
+                coreLibraryDesugaringEnabled true
+            }
+        }
+        // Añade la dependencia de desugaring a TODOS los subproyectos Android
+        proj.dependencies {
+            coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+        }
+    }
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

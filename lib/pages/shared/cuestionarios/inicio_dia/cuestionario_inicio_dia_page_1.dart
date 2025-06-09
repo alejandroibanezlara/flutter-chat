@@ -1,6 +1,8 @@
 // first_start_day_page.dart
 import 'package:chat/pages/shared/colores.dart';
+import 'package:chat/services/personalData/personalData_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class FirstStartDayPage extends StatefulWidget {
   const FirstStartDayPage({Key? key}) : super(key: key);
@@ -43,6 +45,10 @@ final List<String> outlookOptions = [
 
   @override
   Widget build(BuildContext context) {
+
+    // 1. Obtienes el servicio (sin escuchar repaints aquí)
+    final personalDataSvc = Provider.of<PersonalDataService>(context, listen: false);
+
     const double kMaxIconSize = 40;   // tamaño del icono más grande (derecha)
     const double kStepPercent  = 0.1; // 3 % de diferencia por paso
 
@@ -113,7 +119,10 @@ Row(
     /// Icono 1 – Muy triste
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => sleepQuality = sleepOptions[0]),
+        onTap: () {
+          setState(() => sleepQuality = sleepOptions[0]);
+          personalDataSvc.setSleepQuality(sleepQuality!, sleepOptions);
+        },
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(
@@ -130,7 +139,10 @@ Row(
     /// Icono 2 – Triste
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => sleepQuality = sleepOptions[1]),
+        onTap: () {
+          setState(() => sleepQuality = sleepOptions[1]);
+          personalDataSvc.setSleepQuality(sleepQuality!, sleepOptions);
+        },
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(
@@ -147,7 +159,10 @@ Row(
     /// Icono 3 – Indiferente
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => sleepQuality = sleepOptions[2]),
+        onTap: () {
+          setState(() => sleepQuality = sleepOptions[2]);
+          personalDataSvc.setSleepQuality(sleepQuality!, sleepOptions);
+        },
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(
@@ -164,7 +179,10 @@ Row(
     /// Icono 4 – Alegre
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => sleepQuality = sleepOptions[3]),
+        onTap: () {
+          setState(() => sleepQuality = sleepOptions[3]);
+          personalDataSvc.setSleepQuality(sleepQuality!, sleepOptions);
+        },
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(
@@ -181,7 +199,10 @@ Row(
     /// Icono 5 – Muy alegre
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => sleepQuality = sleepOptions[4]),
+        onTap: () {
+          setState(() => sleepQuality = sleepOptions[4]);
+          personalDataSvc.setSleepQuality(sleepQuality!, sleepOptions);
+        },
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(
@@ -242,7 +263,10 @@ Row(
     /// Icono 1 – Muy triste
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => dayOutlook = outlookOptions[0]),
+        onTap: () {
+          setState(() => dayOutlook = outlookOptions[0]);
+          personalDataSvc.setInitialAttitude(dayOutlook!, outlookOptions);
+        }, 
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(
@@ -259,7 +283,10 @@ Row(
     /// Icono 2 – Triste
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => dayOutlook = outlookOptions[1]),
+        onTap: () {
+          setState(() => dayOutlook = outlookOptions[1]);
+          personalDataSvc.setInitialAttitude(dayOutlook!, outlookOptions);
+        }, 
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(
@@ -276,7 +303,10 @@ Row(
     /// Icono 3 – Indiferente
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => dayOutlook = outlookOptions[2]),
+        onTap: () {
+          setState(() => dayOutlook = outlookOptions[2]);
+          personalDataSvc.setInitialAttitude(dayOutlook!, outlookOptions);
+        }, 
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(
@@ -293,7 +323,10 @@ Row(
     /// Icono 4 – Alegre
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => dayOutlook = outlookOptions[3]),
+        onTap: () {
+          setState(() => dayOutlook = outlookOptions[3]);
+          personalDataSvc.setInitialAttitude(dayOutlook!, outlookOptions);
+        }, 
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(
@@ -310,7 +343,10 @@ Row(
     /// Icono 5 – Muy alegre
     Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => dayOutlook = outlookOptions[4]),
+        onTap: () {
+          setState(() => dayOutlook = outlookOptions[4]);
+          personalDataSvc.setInitialAttitude(dayOutlook!, outlookOptions);
+        }, 
         child: Padding(
           padding: const EdgeInsets.all(8),
           child: Image.asset(

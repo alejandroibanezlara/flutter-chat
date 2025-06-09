@@ -20,7 +20,7 @@ class _ProgressPageState extends State<ProgressPage> {
         body: SingleChildScrollView(
         child: Column(
           children: const [
-            RadarChartExample(),
+            VerticalBarChartExample(),
             RecordPage(),
             HallOfFamePage(),
           ],

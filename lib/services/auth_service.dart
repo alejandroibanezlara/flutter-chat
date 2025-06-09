@@ -149,4 +149,10 @@ class AuthService with ChangeNotifier {
     await _storage.delete(key: 'token');
   }
 
+  // Future<void> logout() async {
+  //   await _logOut();
+  //   usuario = null;
+  //   notifyListeners();
+  // }
+
 }

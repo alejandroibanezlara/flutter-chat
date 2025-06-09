@@ -54,7 +54,7 @@ class _NewHabitPageState extends State<NewHabitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ScrollAppBar(currentStep: 0),
+      appBar: ScrollAppBar(currentStep: 0, totalSteps: 5,),
       body: SafeArea(
         child: Column(
           children: [
@@ -235,7 +235,7 @@ class _TimePlaceSelectionPageState extends State<TimePlaceSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ScrollAppBar(currentStep: 1),
+      appBar: ScrollAppBar(currentStep: 1, totalSteps: 5,),
       body: SafeArea(
         child: Column(
           children: [
@@ -436,7 +436,7 @@ class _PersonTypeSelectionPageState extends State<PersonTypeSelectionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ScrollAppBar(currentStep: 2),
+      appBar: ScrollAppBar(currentStep: 2, totalSteps: 5,),
       body: SafeArea(
         child: Column(
           children: [
@@ -661,7 +661,7 @@ class _HabitSummaryPageState extends State<HabitSummaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ScrollAppBar(currentStep: 3),
+      appBar: ScrollAppBar(currentStep: 3, totalSteps: 5,),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

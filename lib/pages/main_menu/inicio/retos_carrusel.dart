@@ -1,31 +1,37 @@
+// retos_carrusel.dart
 import 'package:chat/pages/main_menu/inicio/reto_card_page.dart';
+import 'package:chat/services/challenges/challenge_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:chat/models/challenge.dart';
 
-/// Carrusel que ajusta su alto dinámicamente en función del contenido de la tarjeta actual.
-/// Cada tarjeta se centra horizontalmente y su ancho se calcula en función del ancho de la pantalla.
 class RetosCarrusel extends StatefulWidget {
-  const RetosCarrusel({Key? key}) : super(key: key);
+  final String timeperiod;
+  const RetosCarrusel({Key? key, required this.timeperiod}) : super(key: key);
 
   @override
   _RetosCarruselState createState() => _RetosCarruselState();
 }
 
 class _RetosCarruselState extends State<RetosCarrusel> {
-  final PageController _pageController = PageController(viewportFraction: 0.9);
+  late final PageController _pageController;
+  late Future<List<Challenge>> _futureRetos;
   int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
-    // Listener que actualiza el índice de la página activa.
-    _pageController.addListener(() {
-      final int currentIndex = _pageController.page!.round();
-      if (currentIndex != _currentPage) {
-        setState(() {
-          _currentPage = currentIndex;
-        });
-      }
-    });
+    _pageController = PageController(viewportFraction: 0.9)
+      ..addListener(() {
+        final idx = _pageController.page!.round();
+        if (idx != _currentPage) {
+          setState(() => _currentPage = idx);
+        }
+      });
+
+    // Cargamos los retos filtrados por timePeriod
+    final svc = Provider.of<ChallengeService>(context, listen: false);
+    _futureRetos = svc.getByTimePeriod(widget.timeperiod);
   }
 
   @override
@@ -34,71 +40,70 @@ class _RetosCarruselState extends State<RetosCarrusel> {
     super.dispose();
   }
 
+  // Helper sencillo para mapear cadenas a IconData
+  IconData _iconFromString(String? name) {
+    switch (name) {
+      case 'check_circle': return Icons.check_circle;
+      case 'star':         return Icons.star;
+      case 'flag':         return Icons.flag;
+      default:             return Icons.help_outline;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Cálculo del ancho relativo para cada tarjeta.
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double cardWidth = screenWidth * 0.9;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = screenWidth * 0.9;
 
-    return Container(
-      // Contenedor padre con altura fija para evitar errores de viewport sin límites.
+    return SizedBox(
       height: 260,
-      child: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
-          });
+      child: FutureBuilder<List<Challenge>>(
+        future: _futureRetos,
+        builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snap.hasError) {
+            return Center(child: Text('Error: ${snap.error}'));
+          }
+          final retos = snap.data!;
+          if (retos.isEmpty) {
+            return const Center(child: Text('No hay retos para este período'));
+          }
+
+          return PageView.builder(
+            controller: _pageController,
+            itemCount: retos.length,
+            itemBuilder: (context, i) {
+              final reto = retos[i];
+              final isActive = i == _currentPage;
+              final height = isActive ? 260.0 : 240.0;
+
+              // Ejemplo: si tienes áreasSerInvencible y quieres iconos extra,
+              // aquí mapeamos a Icons.check_circle como placeholder.
+              final extraIcons = reto.areasSerInvencible
+                  ?.map((a) => _iconFromString(a.icono))
+                  .toList() ?? [];
+
+              return Center(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  height: height,
+                  width: cardWidth,
+                  child: RetoCard(
+                    compact: true,
+                    titulo: reto.title,
+                    descripcion: reto.shortText,
+                    iconData: _iconFromString(reto.icon),
+                    iconos: extraIcons,
+                    reto: reto,
+                  ),
+                ),
+              );
+            },
+          );
         },
-        scrollDirection: Axis.horizontal,
-        children: [
-          Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              // La tarjeta seleccionada ocupa 250; las no seleccionadas 200.
-              height: _currentPage == 0 ? 260 : 240,
-              width: cardWidth,
-              child: RetoCard(
-                compact: true,
-                descripcion: 'El mejor reto del mundo El mejor reto del mundo El mejor reto del mundo',
-                iconData: Icons.check_circle,
-                titulo: 'Primer reto',
-                iconos: [Icons.check_circle, Icons.check_circle],
-              ),
-            ),
-          ),
-          Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              height: _currentPage == 1 ? 260 : 240,
-              width: cardWidth,
-              child: RetoCard(
-                compact: true,
-                descripcion: 'Un reto increíble para superarte',
-                iconData: Icons.star,
-                titulo: 'Segundo reto',
-                iconos: [Icons.star, Icons.star_border],
-              ),
-            ),
-          ),
-          Center(
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              height: _currentPage == 2 ? 260 : 240,
-              width: cardWidth,
-              child: RetoCard(
-                compact: true,
-                descripcion: 'Acepta el desafío y demuestra tu valía',
-                iconData: Icons.flag,
-                titulo: 'Tercer reto',
-                iconos: [Icons.flag, Icons.flag],
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

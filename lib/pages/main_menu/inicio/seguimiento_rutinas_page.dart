@@ -261,18 +261,30 @@ class _SemanaRutinasWidgetState extends State<SemanaRutinasWidget> {
                     });
                   },
                   child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
                     decoration: BoxDecoration(
                       color: completed ? rojoBurdeos : grisClaro,
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      IconData(
-                        routine.icono ?? Icons.check.codePoint,
-                        fontFamily: 'MaterialIcons',
-                      ),
-                      size: 24,
-                      color: completed ? Colors.white : Colors.black54,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          IconData(routine.icono ?? Icons.check.codePoint, fontFamily: 'MaterialIcons'),
+                          size: 24,
+                          color: completed ? Colors.white : Colors.black54,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          routine.name ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: completed ? Colors.white : grisCarbon,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );

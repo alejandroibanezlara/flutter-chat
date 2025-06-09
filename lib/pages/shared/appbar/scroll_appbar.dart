@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class ScrollAppBar extends StatelessWidget implements PreferredSizeWidget {
   final int currentStep;
+  final int totalSteps;
   
   @override
   final Size preferredSize;
@@ -9,6 +10,7 @@ class ScrollAppBar extends StatelessWidget implements PreferredSizeWidget {
   const ScrollAppBar({
     super.key, 
     required this.currentStep,
+    required this.totalSteps,
   }) : preferredSize = const Size.fromHeight(kToolbarHeight);
 
   @override
@@ -23,7 +25,7 @@ class ScrollAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       title: Row(
         mainAxisSize: MainAxisSize.min,
-        children: List.generate(5, (index) => Container(
+        children: List.generate(totalSteps, (index) => Container(
           margin: const EdgeInsets.symmetric(horizontal: 2),
           width: 40,
           height: 1,

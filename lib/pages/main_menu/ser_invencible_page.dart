@@ -1,4 +1,8 @@
+import 'package:chat/pages/main_menu/ser_invencible/biblioteca_page.dart';
+import 'package:chat/pages/main_menu/ser_invencible/mindset_page.dart';
 import 'package:chat/pages/main_menu/ser_invencible/mis_invencibles_page.dart';
+import 'package:chat/pages/main_menu/ser_invencible/ranking_page.dart';
+import 'package:chat/pages/main_menu/ser_invencible/tools_page.dart';
 import 'package:flutter/material.dart';
 
 
@@ -21,27 +25,7 @@ class SerInvenciblePage extends StatelessWidget {
         // Divider para separar el título del contenido
         const Divider(color: Colors.grey),
         // Container representativo del contenido de la sección
-        Container(
-          width: double.infinity,
-          height: 100,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 3,
-                offset: Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Center(
-            child: Text(
-              "Contenido de $title",
-              style: const TextStyle(fontSize: 16),
-            ),
-          ),
-        ),
+
       ],
     );
   }
@@ -51,18 +35,23 @@ class SerInvenciblePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: ListView(
+        key: const PageStorageKey('SerInvenciblePageList'),
         padding: const EdgeInsets.all(16.0),
         children: [
-          MisInvenciblesPage(),
-          //sectionWidget("Tus invencibles"),
+          MisInvenciblesPage(key: const PageStorageKey('MisInvenciblesPage')),
+
           const SizedBox(height: 16),
-          sectionWidget("Herramientas desbloqueadas"),
+          ToolsPage(key: const PageStorageKey('ToolsPage')),
           const SizedBox(height: 16),
-          sectionWidget("Mindset (MANTRAS)"),
+
+          MindsetPage(key: const PageStorageKey('MindsetPage')),
           const SizedBox(height: 16),
           sectionWidget("Mi biblioteca"),
+          // ExpandableStoryCard(collapsedText: 'collapsedText', expandedText: 'asdfasdfasdfhjasdfljkadshjlkadsf'),
+          LibraryCardList(key: const PageStorageKey('LibraryCardList')),
           const SizedBox(height: 16),
           sectionWidget("Ranking diario"),
+          DailySummaryView(key: const PageStorageKey('DailySummaryView')),
         ],
       ),
     );

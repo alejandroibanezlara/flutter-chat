@@ -5,6 +5,7 @@ import 'package:chat/models/routine.dart';
 import 'package:chat/pages/main_menu/home_page.dart';
 import 'package:chat/services/auth_service.dart';
 import 'package:chat/services/routine/routine_service.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class RepeatSettingsPage extends StatefulWidget {
@@ -21,6 +22,9 @@ class RepeatSettingsPage extends StatefulWidget {
 class _RepeatSettingsPageState extends State<RepeatSettingsPage> {
   
   final List<String> _weekDays = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+
+  final TextEditingController _nameController = TextEditingController();
+  
 
 int _mapWeekDay(String label) {
   final idx = _weekDays.indexOf(label);
@@ -68,6 +72,7 @@ int _mapWeekDay(String label) {
   void initState() {
     super.initState();
     final rutina = widget.routine;
+    _nameController.text = widget.routine?.name ?? '';
     if (rutina != null) {
       _selectedIcon = rutina.icono != null ? IconData(rutina.icono!, fontFamily: 'MaterialIcons') : null;
       _selectedAreas.addAll(rutina.areas);
@@ -140,6 +145,8 @@ int _mapWeekDay(String label) {
   
 
   Future<void> _submitHabit() async {
+    
+    
     if (_selectedAreas.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Selecciona al menos un área')));
       return;
@@ -198,6 +205,7 @@ int _mapWeekDay(String label) {
         tiempoYlugar: widget.finalPhrase.split(',')[1].trim(),
         tipoPersona: widget.finalPhrase.split('en ')[1].trim(),
         declaracionCompleta: widget.finalPhrase,
+        name: _nameController.text.trim(),
         areas: _selectedAreas,
         icono: _selectedIcon?.codePoint,
         tipo: tipoRutina,  // mejor que _getTipoRutina() dos veces
@@ -260,7 +268,7 @@ int _mapWeekDay(String label) {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ScrollAppBar(currentStep: 4),
+      appBar: ScrollAppBar(currentStep: 4, totalSteps: 5),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -275,6 +283,17 @@ int _mapWeekDay(String label) {
                       fontWeight: FontWeight.w600,
                     ),
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              TextField(
+                controller: _nameController,
+                inputFormatters: [LengthLimitingTextInputFormatter(10)],
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de la rutina',
+                  hintText: 'Máx. 10 caracteres',
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 24),
 
